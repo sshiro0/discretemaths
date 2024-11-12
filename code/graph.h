@@ -8,13 +8,13 @@ typedef struct Node {
 
 typedef struct Graph {
     int num_vertices;
-    Node** adjacency_list
+    Node** adjacency_list;
 } Graph;
 
 Graph* initializeGraph(int num_vertices);
 void readGraph(const char* file_name, Graph* graph);
 void addEdge(Graph* graph, int start, int end);
 void freeGraph(Graph* graph);
-
+void printGraph(struct Graph* graph);
 
 #endif

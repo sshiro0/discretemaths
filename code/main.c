@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
     
     Graph* graph = initializeGraph(0);
     readGraph(file_name, graph);
-
+    printGraph(graph);
 
     freeGraph(graph);
     free(buffer);
