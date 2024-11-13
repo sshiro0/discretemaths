@@ -175,6 +175,24 @@ void dfs(Graph* graph, int* excluded, int* visited, int start_node) {
     freeStack(stack);
 }
 
+int isConnected(Graph* graph){
+    int* visited = (int*)calloc(graph->num_vertices, sizeof(int));
+    int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
+    dfs(graph, excluded, visited, 0);
+
+    for (int i = 0; i < graph->num_vertices; i++) {
+        if (visited[i] == 0) { // alguna parte del arreglo no es visitada
+            free(visited);
+            free(excluded);
+            return 0; // no conexo
+        }
+    }
+    free(visited);
+    free(excluded);
+    return 1; // conexo
+}
+
+
 int main(int argc, char* argv[]) {
     const char* file_name = NULL;
     char *buffer = NULL;
@@ -241,7 +259,13 @@ int main(int argc, char* argv[]) {
             case 4:
                 // tamaño y orden del grafo
             case 5:
-                // es conexo?
+                if (isConnected(graph)) {
+                    printf("El grafo es conexo.\n");
+                }
+                else {
+                    printf("El grafo es no conexo.\n");
+                }
+                break;
             case 6:
                 freeGraph(graph);
                 graph = NULL;
@@ -256,7 +280,7 @@ int main(int argc, char* argv[]) {
                 }
                 file = fopen(file_name, "rb");
                 if(file == NULL) {
-                    printf("Error: No se logró leer un nombre válido de archivo. El programa se cerrará.");
+                    printf("Error: No se logró leer un nombre válido de archivo. El programa se cerrará.\n");
                     return 0;
                 }
                 fscanf(file, "%d", &num_vertices);
@@ -265,7 +289,6 @@ int main(int argc, char* argv[]) {
                 graph = initializeGraph(num_vertices);
                 readGraph(file_name, graph);
                 break;
-
             case 7:
                 return 0;
         }
