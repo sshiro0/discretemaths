@@ -43,7 +43,7 @@ void dfs(Graph* graph, int* excluded, int* visited, int start_node) {
 
         while (neighbor) {
             int neighbor_id = neighbor->vertice;
-            if (!visited[neighbor_id] && !excluded[neighbor_id]) {
+            if (!visited[neighbor_id] && (excluded == NULL || !excluded[neighbor_id])) {
                 visited[neighbor_id] = 1;
                 push(stack, neighbor_id);
             }
