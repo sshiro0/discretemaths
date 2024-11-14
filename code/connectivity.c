@@ -77,23 +77,14 @@ void combine(Graph* graph, int* excluded, int* combination, int start, int idx, 
         }
 }
 
-void generate_combinations(Graph* graph, int* excluded, int k, int* min_disconnectivity) {
-    int combination[k];
-    combine(graph, excluded, combination, 0, 0, k, min_disconnectivity);
-}
-
 int connectivity(Graph* graph) {
     int min_disconnectivity = graph->num_vertices;
 
     int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
 
-    if (!isConnected(graph, excluded)) {
-        free(excluded);
-        return 0;
-    }
-
     for (int k = 1; k <= graph->num_vertices; k++) {
-        generate_combinations(graph, excluded, k, &min_disconnectivity);
+        int combination[k];
+        combine(graph, excluded, combination, 0, 0, k, min_disconnectivity);
         if (min_disconnectivity < graph->num_vertices) {
             break;
         }
@@ -108,30 +99,33 @@ int isKConnected(Graph* graph, int k) {
         return 0;
     }
 
+    int k_ = k-1;
     int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
-    int combination[k];
+    int combination[k_];
     int is_k_connected = 1;
 
-    combineK(graph, excluded, combination, 0, 0, k, &is_k_connected);
+    combineK(graph, excluded, combination, 0, 0, k_, &is_k_connected);
 
     free(excluded);
     return is_k_connected;
 }
 
-void combineK(Graph* graph, int* excluded, int* combination, int start, int idx, int k, int* is_k_connected) {
-    if (*is_k_connected == 0) return;
+void combineK(Graph* graph, int* excluded, int* combination, int start, int idx, int k_, int* is_k_connected) {
+    if (*is_k_connected == 0) {
+        return;
+    }
 
-    if (idx == k) {
-        for (int i = 0; i < k; i++) {
+    if (idx == k_) {
+        for (int i = 0; i < k_; i++) {
             excluded[combination[i]] = 1;
         }
-        if (k < graph->num_vertices-1) {
+        if (k_ < graph->num_vertices-1) {
             if (!isConnected(graph, excluded)) {
                 *is_k_connected = 0;
             }
         }
         
-        for (int i = 0; i < k; i++) {
+        for (int i = 0; i < k_; i++) {
             excluded[combination[i]] = 0;
         }
         return;
@@ -139,6 +133,6 @@ void combineK(Graph* graph, int* excluded, int* combination, int start, int idx,
 
     for (int i = start; i < graph->num_vertices; i++) {
         combination[idx] = i;
-        combine(graph, excluded, combination, i + 1, idx + 1, k, is_k_connected);
+        combineK(graph, excluded, combination, i + 1, idx + 1, k_, is_k_connected);
     }
 }

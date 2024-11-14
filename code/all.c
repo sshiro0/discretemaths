@@ -229,16 +229,13 @@ void combine(Graph* graph, int* excluded, int* combination, int start, int idx, 
             for (int i = 0; i < k; i++) {
                 excluded[combination[i]] = 1;
             }
-            if(k < graph->num_vertices-1){
-                if (!isConnected(graph, excluded)) {
-                        if (k < *min_disconnectivity) {
-                *min_disconnectivity = k;
-                        }
+            
+            if (!isConnected(graph, excluded)) {
+                if (k < *min_disconnectivity) {
+                    *min_disconnectivity = k;
                 }
-            } else {
-            *min_disconnectivity = k;
             }
-
+            
             for (int i = 0; i < k; i++) {
                 excluded[combination[i]] = 0;
             }
@@ -251,23 +248,14 @@ void combine(Graph* graph, int* excluded, int* combination, int start, int idx, 
         }
 }
 
-void generate_combinations(Graph* graph, int* excluded, int k, int* min_disconnectivity) {
-    int combination[k];
-    combine(graph, excluded, combination, 0, 0, k, min_disconnectivity);
-}
-
 int connectivity(Graph* graph) {
     int min_disconnectivity = graph->num_vertices;
 
     int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
 
-    if (!isConnected(graph, excluded)) {
-        free(excluded);
-        return 0;
-    }
-
     for (int k = 1; k <= graph->num_vertices; k++) {
-        generate_combinations(graph, excluded, k, &min_disconnectivity);
+        int combination[k];
+        combine(graph, excluded, combination, 0, 0, k, min_disconnectivity);
         if (min_disconnectivity < graph->num_vertices) {
             break;
         }
@@ -277,19 +265,38 @@ int connectivity(Graph* graph) {
     return min_disconnectivity;
 }
 
-void combineK(Graph* graph, int* excluded, int* combination, int start, int idx, int k, int* is_k_connected) {
-    if (*is_k_connected == 0) return;
+int isKConnected(Graph* graph, int k) {
+    if (k >= graph->num_vertices) {
+        return 0;
+    }
 
-    if (idx == k) {
-        for (int i = 0; i < k; i++) {
+    int k_ = k-1;
+    int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
+    int combination[k_];
+    int is_k_connected = 1;
+
+    combineK(graph, excluded, combination, 0, 0, k_, &is_k_connected);
+
+    free(excluded);
+    return is_k_connected;
+}
+
+void combineK(Graph* graph, int* excluded, int* combination, int start, int idx, int k_, int* is_k_connected) {
+    if (*is_k_connected == 0) {
+        return;
+    }
+
+    if (idx == k_) {
+        for (int i = 0; i < k_; i++) {
             excluded[combination[i]] = 1;
         }
-
-        if (!isConnected(graph, excluded)) {
-            *is_k_connected = 0;
+        if (k_ < graph->num_vertices-1) {
+            if (!isConnected(graph, excluded)) {
+                *is_k_connected = 0;
+            }
         }
-
-        for (int i = 0; i < k; i++) {
+        
+        for (int i = 0; i < k_; i++) {
             excluded[combination[i]] = 0;
         }
         return;
@@ -297,23 +304,8 @@ void combineK(Graph* graph, int* excluded, int* combination, int start, int idx,
 
     for (int i = start; i < graph->num_vertices; i++) {
         combination[idx] = i;
-        combine(graph, excluded, combination, i + 1, idx + 1, k, is_k_connected);
+        combineK(graph, excluded, combination, i + 1, idx + 1, k_, is_k_connected);
     }
-}
-
-int isKConnected(Graph* graph, int k) {
-    if (k >= graph->num_vertices) {
-        return 0;
-    }
-
-    int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
-    int combination[k];
-    int is_k_connected = 1;
-
-    combineK(graph, excluded, combination, 0, 0, k, &is_k_connected);
-
-    free(excluded);
-    return is_k_connected;
 }
 
 int order(Graph* graph) {
@@ -442,14 +434,19 @@ int main(int argc, char* argv[]) {
                 printf("Grado máximo del grado: %d\n", max);
                 break;
             case 3:
-                int k;
-                printf("Ingrese el valor de k para calcular la k-conexidad: ");
-                scanf("%d", &k);
-                if (isKConnected(graph, k)) {
-                    printf("El grafo es %d-conexo.\n", k);
+                if (isConnected(graph, NULL)) {
+                    int k;
+                    printf("Ingrese el valor de k para calcular la k-conexidad: ");
+                    scanf("%d", &k);
+                    if (isKConnected(graph, k)) {
+                        printf("El grafo es %d-conexo.\n", k);
+                    }
+                    else {
+                        printf("El grafo no es %d-conexo.\n", k);
+                    }
                 }
                 else {
-                    printf("El grafo no es %d-conexo.\n", k);
+                    printf("El grafo es no conexo, por lo tanto, no es posible calcular la k-conexidad.\n");
                 }
                 break;
             case 4:
@@ -466,13 +463,23 @@ int main(int argc, char* argv[]) {
                 }
                 break;
             case 6:
-                clock_t start, end;
-                start = clock();
-                int connectivity_value = connectivity(graph);
-                end = clock();
-                double time = (double)(end - start) / CLOCKS_PER_SEC;
-                printf("La conectividad del grafo es %d.\n", connectivity_value);
-                printf("Tiempo ejecución: %f\n", time);
+                if (isConnected(graph, NULL)) {
+                    clock_t start, end;
+                    start = clock();
+                    if (graph->num_vertices == 1) {
+                        printf("La conectividad del grafo es 0.\n");
+                    }
+                    else {
+                        int connectivity_value = connectivity(graph);
+                        printf("La conectividad del grafo es %d.\n", connectivity_value);
+                    }
+                    end = clock();
+                    double time = (double)(end - start) / CLOCKS_PER_SEC;
+                    printf("Tiempo ejecución: %f\n", time);
+                    }
+                else {
+                    printf("El grafo es no conexo, por lo tanto, no es posible calcular la conectividad.\n");
+                }
                 break;
             case 7:
                 freeGraph(graph);
