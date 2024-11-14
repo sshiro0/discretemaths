@@ -249,7 +249,7 @@ void combine(Graph* graph, int* excluded, int* combination, int start, int idx, 
 }
 
 int connectivity(Graph* graph) {
-    int min_disconnectivity = graph->num_vertices;
+    int min_disconnectivity = graph->num_vertices-1;
 
     int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
 
