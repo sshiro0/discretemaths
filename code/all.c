@@ -229,12 +229,15 @@ void combine(Graph* graph, int* excluded, int* combination, int start, int idx, 
             for (int i = 0; i < k; i++) {
                 excluded[combination[i]] = 1;
             }
-            
-            if (!isConnected(graph, excluded)) {
+            if(k < graph->num_vertices-1){
+	      if (!isConnected(graph, excluded)) {
                 if (k < *min_disconnectivity) {
-                    *min_disconnectivity = k;
+		  *min_disconnectivity = k;
                 }
-            }
+	      }
+	    } else {
+	      *min_disconnectivity = k;
+	    }
             
             for (int i = 0; i < k; i++) {
                 excluded[combination[i]] = 0;
