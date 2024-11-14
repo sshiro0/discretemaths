@@ -125,11 +125,12 @@ void combineK(Graph* graph, int* excluded, int* combination, int start, int idx,
         for (int i = 0; i < k; i++) {
             excluded[combination[i]] = 1;
         }
-
-        if (!isConnected(graph, excluded)) {
-            *is_k_connected = 0;
+        if (k < graph->num_vertices-1) {
+            if (!isConnected(graph, excluded)) {
+                *is_k_connected = 0;
+            }
         }
-
+        
         for (int i = 0; i < k; i++) {
             excluded[combination[i]] = 0;
         }

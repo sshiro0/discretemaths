@@ -230,15 +230,15 @@ void combine(Graph* graph, int* excluded, int* combination, int start, int idx, 
                 excluded[combination[i]] = 1;
             }
             if(k < graph->num_vertices-1){
-	      if (!isConnected(graph, excluded)) {
-                if (k < *min_disconnectivity) {
-		  *min_disconnectivity = k;
+                if (!isConnected(graph, excluded)) {
+                        if (k < *min_disconnectivity) {
+                *min_disconnectivity = k;
+                        }
                 }
-	      }
-	    } else {
-	      *min_disconnectivity = k;
-	    }
-            
+            } else {
+            *min_disconnectivity = k;
+            }
+
             for (int i = 0; i < k; i++) {
                 excluded[combination[i]] = 0;
             }
@@ -427,8 +427,7 @@ int main(int argc, char* argv[]) {
         printf("4. Obtener Tamaño y Orden del Grafo.\n");
         printf("5. Obtener conexidad.\n");
         printf("6. Obtener conectividad.\n");
-        printf("7. Ingresar un nuevo grafo.\n");
-        printf("Si desea salir del programa, presione 8.\n");
+        printf("Si desea salir del programa, presione 7.\n");
         scanf("%d", &action);
 
         system("clear");
@@ -476,29 +475,6 @@ int main(int argc, char* argv[]) {
                 printf("Tiempo ejecución: %f\n", time);
                 break;
             case 7:
-                freeGraph(graph);
-                graph = NULL;
-
-                printf("Ingrese el nombre del nuevo archivo: ");
-                buffer_read = getline(&buffer, &buffer_size, stdin);
-                if (buffer_read != -1) {
-                    if (buffer[buffer_read - 1] == '\n') {
-                        buffer[buffer_read - 1] = '\0';
-                    }
-                    file_name = buffer;
-                }
-                file = fopen(file_name, "rb");
-                if(file == NULL) {
-                    printf("Error: No se logró leer un nombre válido de archivo. El programa se cerrará.\n");
-                    return 0;
-                }
-                fscanf(file, "%d", &num_vertices);
-                fclose(file);
-
-                graph = initializeGraph(num_vertices);
-                readGraph(file_name, graph);
-                break;
-            case 8:
                 freeGraph(graph);
                 free(buffer);
                 return 0;
