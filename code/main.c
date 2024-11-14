@@ -1,4 +1,5 @@
 #include <graph.h>
+#include <degree.h>
 #include <connectivity.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,12 +60,16 @@ int main(int argc, char* argv[]) {
         printf("Si desea salir del programa, presione 8.\n");
         scanf("%d", &action);
 
+        system("clear");
         switch (action) {
             case 1:
                 printGraph(graph);
                 break;
             case 2:
-                // grados
+                int min = minDegree(graph);
+                int max = maxDegree(graph);
+                printf("Grado mínimo del grado: %d\n", min);
+                printf("Grado máximo del grado: %d\n", max);
                 break;
             case 3:
                 int k;
@@ -78,7 +83,9 @@ int main(int argc, char* argv[]) {
                 }
                 break;
             case 4:
-                // tamaño y orden del grafo
+                printf("Orden del grafo: %d\n", order(graph));
+                printf("Tamaño del grafo: %d\n", size(graph));
+    
                 break;
             case 5:
                 if (isConnected(graph, NULL)) {
@@ -89,8 +96,13 @@ int main(int argc, char* argv[]) {
                 }
                 break;
             case 6:
+                clock_t start, end;
+                start = clock();
                 int connectivity_value = connectivity(graph);
+                end = clock();
+                double time = (double)(end - start) / CLOCKS_PER_SEC;
                 printf("La conectividad del grafo es %d.\n", connectivity_value);
+                printf("Tiempo ejecución: %f\n", time);
                 break;
             case 7:
                 freeGraph(graph);

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <limits.h>
 
 typedef struct Node {
     int vertice;
@@ -273,6 +274,30 @@ int connectivity(Graph* graph) {
     return min_disconnectivity;
 }
 
+void combineK(Graph* graph, int* excluded, int* combination, int start, int idx, int k, int* is_k_connected) {
+    if (*is_k_connected == 0) return;
+
+    if (idx == k) {
+        for (int i = 0; i < k; i++) {
+            excluded[combination[i]] = 1;
+        }
+
+        if (!isConnected(graph, excluded)) {
+            *is_k_connected = 0;
+        }
+
+        for (int i = 0; i < k; i++) {
+            excluded[combination[i]] = 0;
+        }
+        return;
+    }
+
+    for (int i = start; i < graph->num_vertices; i++) {
+        combination[idx] = i;
+        combine(graph, excluded, combination, i + 1, idx + 1, k, is_k_connected);
+    }
+}
+
 int isKConnected(Graph* graph, int k) {
     if (k >= graph->num_vertices) {
         return 0;
@@ -288,27 +313,64 @@ int isKConnected(Graph* graph, int k) {
     return is_k_connected;
 }
 
-void combineK(Graph* graph, int* excluded, int* combination, int start, int idx, int k, int* is_k_connected) {
-    if (*is_k_connected == 0) return;
+int order(Graph* graph) {
+    return graph->num_vertices;
+}
 
-    if (idx == k) {
-        for (int i = 0; i < k; i++) {
-            excluded[combination[i]] = 1;
+int size(Graph* graph) {
+    int edge_count = 0;
+    for (int i = 0; i < graph->num_vertices; i++) {
+        Node* temp = graph->adjacency_lists[i];
+        while (temp) {
+            edge_count++;
+            temp = temp->next_node;
         }
-
-        if (!isGraphConnectedAfterExclusion(graph, excluded)) {
-            *is_k_connected = 0;
-        }
-
-        for (int i = 0; i < k; i++) {
-            excluded[combination[i]] = 0;
-        }
-        return;
     }
+    return edge_count / 2;
+}
 
-    for (int i = start; i < graph->num_vertices; i++) {
-        combination[idx] = i;
-        combine(graph, excluded, combination, i + 1, idx + 1, k, is_k_connected);
+int maxDegree(Graph* graph) {
+    int max_deg = 0;
+    
+    for (int i = 0; i < graph->num_vertices; i++) {
+        int degree = 0;
+        Node* temp = graph->adjacency_lists[i];
+        
+        while (temp) {
+            degree++;
+            temp = temp->next_node;
+        }
+        
+        if (degree > max_deg) {
+            max_deg = degree;
+        }
+    }
+    
+    return max_deg;
+}
+
+int minDegree(Graph* graph) {
+    int min_deg = INT_MAX;
+    
+    for (int i = 0; i < graph->num_vertices; i++) {
+        int degree = 0;
+        Node* temp = graph->adjacency_lists[i];
+        
+        while (temp) {
+            degree++;
+            temp = temp->next_node;
+        }
+        
+        if (degree < min_deg) {
+            min_deg = degree;
+        }
+    }
+    
+    if (min_deg == INT_MAX) {
+        return 0;
+    }
+    else {
+        return min_deg;
     }
 }
 
@@ -366,12 +428,16 @@ int main(int argc, char* argv[]) {
         printf("Si desea salir del programa, presione 8.\n");
         scanf("%d", &action);
 
+        system("clear");
         switch (action) {
             case 1:
                 printGraph(graph);
                 break;
             case 2:
-                // grados
+                int min = minDegree(graph);
+                int max = maxDegree(graph);
+                printf("Grado mínimo del grado: %d\n", min);
+                printf("Grado máximo del grado: %d\n", max);
                 break;
             case 3:
                 int k;
@@ -385,7 +451,9 @@ int main(int argc, char* argv[]) {
                 }
                 break;
             case 4:
-                // tamaño y orden del grafo
+                printf("Orden del grafo: %d\n", order(graph));
+                printf("Tamaño del grafo: %d\n", size(graph));
+    
                 break;
             case 5:
                 if (isConnected(graph, NULL)) {
@@ -396,8 +464,13 @@ int main(int argc, char* argv[]) {
                 }
                 break;
             case 6:
+                clock_t start, end;
+                start = clock();
                 int connectivity_value = connectivity(graph);
+                end = clock();
+                double time = (double)(end - start) / CLOCKS_PER_SEC;
                 printf("La conectividad del grafo es %d.\n", connectivity_value);
+                printf("Tiempo ejecución: %f\n", time);
                 break;
             case 7:
                 freeGraph(graph);

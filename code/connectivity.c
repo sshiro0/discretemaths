@@ -126,7 +126,7 @@ void combineK(Graph* graph, int* excluded, int* combination, int start, int idx,
             excluded[combination[i]] = 1;
         }
 
-        if (!isGraphConnectedAfterExclusion(graph, excluded)) {
+        if (!isConnected(graph, excluded)) {
             *is_k_connected = 0;
         }
 
