@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 typedef struct Node {
     int vertice;
@@ -34,7 +35,6 @@ Graph* initializeGraph(int num_vertices) {
     }
 
     graph->num_vertices = num_vertices;
-
     graph->adjacency_lists= (Node**)malloc(num_vertices * sizeof(Node*));
 
     if (!graph->adjacency_lists) {
@@ -66,7 +66,6 @@ void addEdge(Graph* graph, int start, int end) {
     new_node = createNode(start);
     new_node->next_node = graph->adjacency_lists[end];
     graph->adjacency_lists[end] = new_node;
-    
 }
 
 void readGraph(const char* file_name, Graph* graph) {
@@ -165,7 +164,7 @@ void dfs(Graph* graph, int* excluded, int* visited, int start_node) {
 
         while (neighbor) {
             int neighbor_id = neighbor->vertice;
-            if (!visited[neighbor_id] && !excluded[neighbor_id]) {
+            if (!visited[neighbor_id] && (excluded == NULL || !excluded[neighbor_id])) {
                 visited[neighbor_id] = 1;
                 push(stack, neighbor_id);
             }
@@ -175,16 +174,25 @@ void dfs(Graph* graph, int* excluded, int* visited, int start_node) {
     freeStack(stack);
 }
 
-int isConnected(Graph* graph){
+int isConnected(Graph* graph, int *excluded){
     int* visited = (int*)calloc(graph->num_vertices, sizeof(int));
-    int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
-    dfs(graph, excluded, visited, 0);
 
     int start_node = -1;
-    for (int i = 0; i < graph->num_vertices; i++) {
-        if (graph->adjacency_lists[i] != NULL) { 
-            start_node = i;
-            break;
+
+    if (excluded == NULL) {
+        for (int i = 0; i < graph->num_vertices; i++) {
+            if (graph->adjacency_lists[i] != NULL) { 
+                start_node = i;
+                break;
+            }
+        }
+    }
+    else {
+        for (int i = 0; i < graph->num_vertices; i++) {
+            if (!excluded[i]) {
+                start_node = i;
+                break;
+            }
         }
     }
 
@@ -195,18 +203,114 @@ int isConnected(Graph* graph){
 
     dfs(graph, excluded, visited, start_node);
 
-    for (int i = 0; i < graph->num_vertices; i++) {
-        if (visited[i] == 0) {
-            free(visited);
-            return 0;
+    if (excluded == NULL) {
+        for (int i = 0; i < graph->num_vertices; i++) {
+            if (visited[i] == 0) {
+                free(visited);
+                return 0;
+            }
+        }
+    }
+    else {
+        for (int i = 0; i < graph->num_vertices; i++) {
+            if(visited[i] == 0 && !excluded[i]){ 
+                return 0;
+            }
         }
     }
 
     free(visited);
-    free(excluded);
     return 1;
 }
 
+void combine(Graph* graph, int* excluded, int* combination, int start, int idx, int k, int* min_disconnectivity) {
+        if (idx == k) {
+            for (int i = 0; i < k; i++) {
+                excluded[combination[i]] = 1;
+            }
+            
+            if (!isConnected(graph, excluded)) {
+                if (k < *min_disconnectivity) {
+                    *min_disconnectivity = k;
+                }
+            }
+            
+            for (int i = 0; i < k; i++) {
+                excluded[combination[i]] = 0;
+            }
+            return;
+        }
+
+        for (int i = start; i < graph->num_vertices; i++) {
+            combination[idx] = i;
+            combine(graph, excluded, combination, i + 1, idx + 1, k, min_disconnectivity);
+        }
+}
+
+void generate_combinations(Graph* graph, int* excluded, int k, int* min_disconnectivity) {
+    int combination[k];
+    combine(graph, excluded, combination, 0, 0, k, min_disconnectivity);
+}
+
+int connectivity(Graph* graph) {
+    int min_disconnectivity = graph->num_vertices;
+
+    int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
+
+    if (!isConnected(graph, excluded)) {
+        free(excluded);
+        return 0;
+    }
+
+    for (int k = 1; k <= graph->num_vertices; k++) {
+        generate_combinations(graph, excluded, k, &min_disconnectivity);
+        if (min_disconnectivity < graph->num_vertices) {
+            break;
+        }
+    }
+
+    free(excluded);
+    return min_disconnectivity;
+}
+
+int isKConnected(Graph* graph, int k) {
+    if (k >= graph->num_vertices) {
+        return 0;
+    }
+
+    int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
+    int combination[k];
+    int is_k_connected = 1;
+
+    combineK(graph, excluded, combination, 0, 0, k, &is_k_connected);
+
+    free(excluded);
+    return is_k_connected;
+}
+
+void combineK(Graph* graph, int* excluded, int* combination, int start, int idx, int k, int* is_k_connected) {
+    if (*is_k_connected == 0) return;
+
+    if (idx == k) {
+        for (int i = 0; i < k; i++) {
+            excluded[combination[i]] = 1;
+        }
+
+        if (!isGraphConnectedAfterExclusion(graph, excluded)) {
+            *is_k_connected = 0;
+        }
+
+        for (int i = 0; i < k; i++) {
+            excluded[combination[i]] = 0;
+        }
+        return;
+    }
+
+    for (int i = start; i < graph->num_vertices; i++) {
+        combination[idx] = i;
+        combine(graph, excluded, combination, i + 1, idx + 1, k, is_k_connected);
+    }
+}
 
 int main(int argc, char* argv[]) {
     const char* file_name = NULL;
@@ -214,7 +318,7 @@ int main(int argc, char* argv[]) {
     size_t buffer_size = 0;
     ssize_t buffer_read;
     FILE *file = NULL;
-    int action = NULL;
+    int action = 0;
 
     if(argc > 1) {
         file_name = argv[1];
@@ -245,7 +349,6 @@ int main(int argc, char* argv[]) {
 
     int num_vertices;
     fscanf(file, "%d", &num_vertices);
-
     fclose(file);
     
     Graph* graph = initializeGraph(num_vertices);
@@ -255,11 +358,12 @@ int main(int argc, char* argv[]) {
         printf("Bienvenid@. Ingrese alguno de los siguientes números para realizar una acción:\n");
         printf("1. Mostrar Grafo ingresado en formato de Lista de Adyacencia.\n");
         printf("2. Obtener grados mínimos y máximos del Grafo.\n");
-        printf("3. Obtener k-conexidad del Grafo.\n");
+        printf("3. Obtener k-conexidad del Grafo con un k ingresado.\n");
         printf("4. Obtener Tamaño y Orden del Grafo.\n");
         printf("5. Obtener conexidad.\n");
-        printf("6. Ingresar un nuevo grafo.\n");
-        printf("Si desea salir del programa, presione 7.\n");
+        printf("6. Obtener conectividad.\n");
+        printf("7. Ingresar un nuevo grafo.\n");
+        printf("Si desea salir del programa, presione 8.\n");
         scanf("%d", &action);
 
         switch (action) {
@@ -270,11 +374,21 @@ int main(int argc, char* argv[]) {
                 // grados
                 break;
             case 3:
-                // k-conexidad
+                int k;
+                printf("Ingrese el valor de k para calcular la k-conexidad: ");
+                scanf("%d", &k);
+                if (isKConnected(graph, k)) {
+                    printf("El grafo es %d-conexo.\n", k);
+                }
+                else {
+                    printf("El grafo no es %d-conexo.\n", k);
+                }
+                break;
             case 4:
                 // tamaño y orden del grafo
+                break;
             case 5:
-                if (isConnected(graph)) {
+                if (isConnected(graph, NULL)) {
                     printf("El grafo es conexo.\n");
                 }
                 else {
@@ -282,6 +396,10 @@ int main(int argc, char* argv[]) {
                 }
                 break;
             case 6:
+                int connectivity_value = connectivity(graph);
+                printf("La conectividad del grafo es %d.\n", connectivity_value);
+                break;
+            case 7:
                 freeGraph(graph);
                 graph = NULL;
 
@@ -304,8 +422,13 @@ int main(int argc, char* argv[]) {
                 graph = initializeGraph(num_vertices);
                 readGraph(file_name, graph);
                 break;
-            case 7:
+            case 8:
+                freeGraph(graph);
+                free(buffer);
                 return 0;
+            default:
+                printf("Ingrese una opción válida.\n");
+                break;
         }
     }
 

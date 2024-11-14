@@ -17,7 +17,6 @@ Graph* initializeGraph(int num_vertices) {
     }
 
     graph->num_vertices = num_vertices;
-
     graph->adjacency_lists= (Node**)malloc(num_vertices * sizeof(Node*));
 
     if (!graph->adjacency_lists) {
@@ -36,22 +35,17 @@ Graph* initializeGraph(int num_vertices) {
 void addEdge(Graph* graph, int start, int end) {
     Node* temp = graph->adjacency_lists[start];
     while (temp) {
-        if (temp->vertice == end) return; // Edge already exists
+        if (temp->vertice == end) return;
         temp = temp->next_node;
     }
 
     Node* new_node = createNode(end);
-
     new_node->next_node = graph->adjacency_lists[start];
-
     graph->adjacency_lists[start] = new_node;
 
     new_node = createNode(start);
-
     new_node->next_node = graph->adjacency_lists[end];
-
     graph->adjacency_lists[end] = new_node;
-    
 }
 
 void readGraph(const char* file_name, Graph* graph) {

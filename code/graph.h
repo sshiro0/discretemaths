@@ -16,7 +16,6 @@ Graph* initializeGraph(int num_vertices);
 void addEdge(Graph* graph, int start, int end);
 void readGraph(const char* file_name, Graph* graph);
 void freeGraph(Graph* graph);
-void printGraph(struct Graph* graph);
 void printGraph(Graph* graph);
 
 #endif

@@ -3,14 +3,26 @@
 #include <dfs.h>
 #include <stddef.h>
 
-int isConnected(Graph* graph){
+
+int isConnected(Graph* graph, int *excluded) {
     int* visited = (int*)calloc(graph->num_vertices, sizeof(int));
 
     int start_node = -1;
-    for (int i = 0; i < graph->num_vertices; i++) {
-        if (graph->adjacency_lists[i] != NULL) { 
-            start_node = i;
-            break;
+
+    if (excluded == NULL) {
+        for (int i = 0; i < graph->num_vertices; i++) {
+            if (graph->adjacency_lists[i] != NULL) { 
+                start_node = i;
+                break;
+            }
+        }
+    }
+    else {
+        for (int i = 0; i < graph->num_vertices; i++) {
+            if (!excluded[i]) {
+                start_node = i;
+                break;
+            }
         }
     }
 
@@ -19,12 +31,21 @@ int isConnected(Graph* graph){
         return 0;
     }
 
-    dfs(graph, NULL, visited, start_node);
+    dfs(graph, excluded, visited, start_node);
 
-    for (int i = 0; i < graph->num_vertices; i++) {
-        if (visited[i] == 0) {
-            free(visited);
-            return 0;
+    if (excluded == NULL) {
+        for (int i = 0; i < graph->num_vertices; i++) {
+            if (visited[i] == 0) {
+                free(visited);
+                return 0;
+            }
+        }
+    }
+    else {
+        for (int i = 0; i < graph->num_vertices; i++) {
+            if(visited[i] == 0 && !excluded[i]){ 
+                return 0;
+            }
         }
     }
 
@@ -32,5 +53,91 @@ int isConnected(Graph* graph){
     return 1;
 }
 
+void combine(Graph* graph, int* excluded, int* combination, int start, int idx, int k, int* min_disconnectivity) {
+        if (idx == k) {
+            for (int i = 0; i < k; i++) {
+                excluded[combination[i]] = 1;
+            }
+            
+            if (!isConnected(graph, excluded)) {
+                if (k < *min_disconnectivity) {
+                    *min_disconnectivity = k;
+                }
+            }
+            
+            for (int i = 0; i < k; i++) {
+                excluded[combination[i]] = 0;
+            }
+            return;
+        }
 
+        for (int i = start; i < graph->num_vertices; i++) {
+            combination[idx] = i;
+            combine(graph, excluded, combination, i + 1, idx + 1, k, min_disconnectivity);
+        }
+}
 
+void generate_combinations(Graph* graph, int* excluded, int k, int* min_disconnectivity) {
+    int combination[k];
+    combine(graph, excluded, combination, 0, 0, k, min_disconnectivity);
+}
+
+int connectivity(Graph* graph) {
+    int min_disconnectivity = graph->num_vertices;
+
+    int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
+
+    if (!isConnected(graph, excluded)) {
+        free(excluded);
+        return 0;
+    }
+
+    for (int k = 1; k <= graph->num_vertices; k++) {
+        generate_combinations(graph, excluded, k, &min_disconnectivity);
+        if (min_disconnectivity < graph->num_vertices) {
+            break;
+        }
+    }
+
+    free(excluded);
+    return min_disconnectivity;
+}
+
+int isKConnected(Graph* graph, int k) {
+    if (k >= graph->num_vertices) {
+        return 0;
+    }
+
+    int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
+    int combination[k];
+    int is_k_connected = 1;
+
+    combineK(graph, excluded, combination, 0, 0, k, &is_k_connected);
+
+    free(excluded);
+    return is_k_connected;
+}
+
+void combineK(Graph* graph, int* excluded, int* combination, int start, int idx, int k, int* is_k_connected) {
+    if (*is_k_connected == 0) return;
+
+    if (idx == k) {
+        for (int i = 0; i < k; i++) {
+            excluded[combination[i]] = 1;
+        }
+
+        if (!isGraphConnectedAfterExclusion(graph, excluded)) {
+            *is_k_connected = 0;
+        }
+
+        for (int i = 0; i < k; i++) {
+            excluded[combination[i]] = 0;
+        }
+        return;
+    }
+
+    for (int i = start; i < graph->num_vertices; i++) {
+        combination[idx] = i;
+        combine(graph, excluded, combination, i + 1, idx + 1, k, is_k_connected);
+    }
+}
