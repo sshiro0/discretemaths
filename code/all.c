@@ -419,7 +419,8 @@ int main(int argc, char* argv[]) {
         printf("4. Obtener Tamaño y Orden del Grafo.\n");
         printf("5. Obtener conexidad.\n");
         printf("6. Obtener conectividad.\n");
-        printf("Si desea salir del programa, presione 7.\n");
+        printf("7. Obtener promedio en n iteraciones de calculo de conectividad.\n");
+	printf("8. Salir\n");
         scanf("%d", &action);
 
         system("clear");
@@ -491,7 +492,33 @@ int main(int argc, char* argv[]) {
                     printf("El grafo es no conexo, por lo tanto, no es posible calcular la conectividad.\n");
                 }
                 break;
-            case 7:
+	    case 7:
+	      int n = 0;
+	      double promedio = 0;
+	      do{
+	      printf("Indicar número de iteraciones: ");
+	      scanf("%d",&n);
+	      }while(n < 0);
+
+	      printf("Tiempos de ejecución: ");
+	      for(int i = 0; i < n; i++){
+		clock_t start, end;
+		start = clock();
+		if (graph->num_vertices == 1) {
+		  
+		}
+		else {
+		  int connectivity_value = connectivity(graph);
+		}
+		end = clock();
+		double time = (double)(end - start) / CLOCKS_PER_SEC;
+		promedio += time;
+		printf("%f ", time);
+	      }
+	      promedio /= n;
+	      printf("\nPromedio de tiempos: %f\n", promedio);
+	      break;
+            case 8:
                 freeGraph(graph);
                 free(buffer);
                 return 0;
