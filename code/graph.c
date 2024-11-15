@@ -94,11 +94,11 @@ void printGraph(Graph* graph) {
     printf("Vertex:  Adjacency List\n");
     for (int v = 0; v < graph->num_vertices; v++) {
         Node* temp = graph->adjacency_lists[v];
-        printf("%d --->", v + 1);
+        printf("%d:", v + 1);
         while (temp) {
-            printf(" %d ->", temp->vertice + 1);
+            printf(" %d ", temp->vertice + 1);
             temp = temp->next_node;
         }
-        printf(" NULL\n");  
+        printf("\n");
     }
 }

@@ -136,8 +136,8 @@ int main(int argc, char* argv[]) {
                 printf("Ingrese una opción válida.\n");
                 break;
         }
+        printf("\n");
     }
-
     freeGraph(graph);
     free(buffer);
     return 0;
