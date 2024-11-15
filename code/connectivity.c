@@ -73,7 +73,7 @@ void combine(Graph* graph, int* excluded, int* combination, int start, int idx, 
 
         for (int i = start; i < graph->num_vertices; i++) {
             combination[idx] = i;
-            combine(graph, excluded, combination, i + 1, idx + 1, k, min_disconnectivity);
+            combine(graph, excluded, combination, i + 1, idx + 1, k, &min_disconnectivity);
         }
 }
 
@@ -92,22 +92,6 @@ int connectivity(Graph* graph) {
 
     free(excluded);
     return min_disconnectivity;
-}
-
-int isKConnected(Graph* graph, int k) {
-    if (k >= graph->num_vertices) {
-        return 0;
-    }
-
-    int k_ = k-1;
-    int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
-    int combination[k_];
-    int is_k_connected = 1;
-
-    combineK(graph, excluded, combination, 0, 0, k_, &is_k_connected);
-
-    free(excluded);
-    return is_k_connected;
 }
 
 void combineK(Graph* graph, int* excluded, int* combination, int start, int idx, int k_, int* is_k_connected) {
@@ -135,4 +119,20 @@ void combineK(Graph* graph, int* excluded, int* combination, int start, int idx,
         combination[idx] = i;
         combineK(graph, excluded, combination, i + 1, idx + 1, k_, is_k_connected);
     }
+}
+
+int isKConnected(Graph* graph, int k) {
+    if (k >= graph->num_vertices) {
+        return 0;
+    }
+
+    int k_ = k-1;
+    int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
+    int combination[k_];
+    int is_k_connected = 1;
+
+    combineK(graph, excluded, combination, 0, 0, k_, &is_k_connected);
+
+    free(excluded);
+    return is_k_connected;
 }
