@@ -1,6 +1,0 @@
-Example Graphs
-0: from the document
-1: a graph with 3 nodes, all connected
-2: a disconected graph with 2 components
-3: a completed graph with 4 vértices
-4: a graph with 5 vertex and 1 isolated vertex

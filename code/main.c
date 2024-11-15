@@ -49,14 +49,15 @@ int main(int argc, char* argv[]) {
     readGraph(file_name, graph);
     
     while (1) {
-        printf("Bienvenid@. Ingrese alguno de los siguientes números para realizar una acción:\n");
+        printf("Ingrese alguno de los siguientes números para realizar una acción:\n");
         printf("1. Mostrar Grafo ingresado en formato de Lista de Adyacencia.\n");
         printf("2. Obtener grados mínimos y máximos del Grafo.\n");
         printf("3. Obtener k-conexidad del Grafo con un k ingresado.\n");
         printf("4. Obtener Tamaño y Orden del Grafo.\n");
         printf("5. Obtener conexidad.\n");
         printf("6. Obtener conectividad.\n");
-        printf("Si desea salir del programa, presione 7.\n");
+        printf("7. Obtener promedio en n iteraciones de calculo de conectividad.\n");
+	printf("8. Salir\n");
         scanf("%d", &action);
 
         system("clear");
@@ -129,6 +130,28 @@ int main(int argc, char* argv[]) {
                 }
                 break;
             case 7:
+                int n = 0;
+                double promedio = 0;
+                do {
+                printf("Indicar número de iteraciones: ");
+                scanf("%d",&n);
+                } while(n < 0);
+                printf("Tiempos de ejecución: ");
+                for(int i = 0; i < n; i++){
+                    clock_t start, end;
+                    start = clock();
+                    if (graph->num_vertices != 1) {
+                        int connectivity_value = connectivity(graph);
+                    }
+                    end = clock();
+                    double time = (double)(end - start) / CLOCKS_PER_SEC;
+                    promedio += time;
+                    printf("%f ", time);
+                }
+                promedio /= n;
+                printf("\nPromedio de tiempos: %f\n", promedio);
+                break;
+            case 8:
                 freeGraph(graph);
                 free(buffer);
                 return 0;

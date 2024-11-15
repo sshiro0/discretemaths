@@ -52,4 +52,3 @@ void dfs(Graph* graph, int* excluded, int* visited, int start_node) {
     }
     freeStack(stack);
 }
-

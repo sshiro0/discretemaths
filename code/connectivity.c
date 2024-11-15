@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 
-int isConnected(Graph* graph, int *excluded) {
+int isConnected(Graph* graph, int *excluded){
     int* visited = (int*)calloc(graph->num_vertices, sizeof(int));
 
     int start_node = -1;
@@ -73,18 +73,18 @@ void combine(Graph* graph, int* excluded, int* combination, int start, int idx, 
 
         for (int i = start; i < graph->num_vertices; i++) {
             combination[idx] = i;
-            combine(graph, excluded, combination, i + 1, idx + 1, k, &min_disconnectivity);
+            combine(graph, excluded, combination, i + 1, idx + 1, k, min_disconnectivity);
         }
 }
 
 int connectivity(Graph* graph) {
-    int min_disconnectivity = graph->num_vertices;
+    int min_disconnectivity = graph->num_vertices-1;
 
     int* excluded = (int*)calloc(graph->num_vertices, sizeof(int));
 
     for (int k = 1; k <= graph->num_vertices; k++) {
         int combination[k];
-        combine(graph, excluded, combination, 0, 0, k, min_disconnectivity);
+        combine(graph, excluded, combination, 0, 0, k, &min_disconnectivity);
         if (min_disconnectivity < graph->num_vertices) {
             break;
         }

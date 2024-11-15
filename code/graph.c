@@ -35,7 +35,9 @@ Graph* initializeGraph(int num_vertices) {
 void addEdge(Graph* graph, int start, int end) {
     Node* temp = graph->adjacency_lists[start];
     while (temp) {
-        if (temp->vertice == end) return;
+        if (temp->vertice == end){
+            return;
+        }
         temp = temp->next_node;
     }
 
