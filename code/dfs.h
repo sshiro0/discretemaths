@@ -1,6 +1,8 @@
 #ifndef DFS_H
 #define DFS_H
 
+#include "graph.h"
+
 typedef struct Stack {
     int* items;
     int top;

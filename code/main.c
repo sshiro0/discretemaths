@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
+#include <string.h>
 
 int main(int argc, char* argv[]) {
     const char* file_name = NULL;
