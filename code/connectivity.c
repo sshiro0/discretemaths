@@ -1,8 +1,7 @@
-#include <connectivity.h>
-#include <graph.h>
-#include <dfs.h>
+#include "connectivity.h"
+#include "graph.h"
+#include "dfs.h"
 #include <stddef.h>
-
 
 int isConnected(Graph* graph, int *excluded){
     int* visited = (int*)calloc(graph->num_vertices, sizeof(int));

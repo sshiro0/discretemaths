@@ -1,6 +1,6 @@
-#include <graph.h>
-#include <degree.h>
-#include <connectivity.h>
+#include "graph.h"
+#include "degree.h"
+#include "connectivity.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

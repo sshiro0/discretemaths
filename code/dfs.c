@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <dfs.h>
-#include <graph.h>
+#include "dfs.h"
+#include "graph.h"
 
 Stack* createStack(int max_size) {
     Stack* stack = (Stack*)malloc(sizeof(Stack));

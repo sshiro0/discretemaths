@@ -1,5 +1,5 @@
-#include <graph.h>
-#include <degree.h>
+#include "graph.h"
+#include "degree.h"
 #include <limits.h>
 
 int order(Graph* graph) {

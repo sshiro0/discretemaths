@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <graph.h>
+#include "graph.h"
 
 Node* createNode(int v) {
   Node* new_node = (Node*)malloc(sizeof(Node));
