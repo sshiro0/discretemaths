@@ -9,7 +9,7 @@ Proyecto Semestral: Matemáticas Discretas
 
 ## Instrucciones de ejecución:
 
-Para inicializar, compilamos con la siguiente línea de comando: *“gcc -o programa main.c connectivity.c degree.c dfs.c graph.c”*.
+Para inicializar, compilamos con la siguiente línea de comando: *“make”* o *“gcc -o programa main.c connectivity.c degree.c dfs.c graph.c”*.
 Posteriormente, ejecutar con: *"./programa"*.
 
 Se recomienda sacar a los archivos de grafos de sus carpetas y dejarlos en el mismo directorio que el ejecutable.
