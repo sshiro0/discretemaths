@@ -85,9 +85,6 @@ int connectivity(Graph* graph) {
     for (int k = 1; k <= graph->num_vertices; k++) {
         int combination[k];
         combine(graph, excluded, combination, 0, 0, k, &min_disconnectivity);
-        if (min_disconnectivity < graph->num_vertices) {
-            break;
-        }
     }
 
     free(excluded);

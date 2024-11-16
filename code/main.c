@@ -75,8 +75,6 @@ int main(int argc, char* argv[]) {
             case 3:
                 if (isConnected(graph, NULL)) {
                     int k;
-                    clock_t start, end;
-                    start = clock();
                     printf("Ingrese el valor de k para calcular la k-conexidad: ");
                     scanf("%d", &k);
                     if (isKConnected(graph, k)) {
@@ -85,9 +83,6 @@ int main(int argc, char* argv[]) {
                     else {
                         printf("El grafo no es %d-conexo.\n", k);
                     }
-                    end = clock();
-                    double time = (double)(end - start) / CLOCKS_PER_SEC;
-                    printf("Tiempo ejecución: %f\n", time);
                 }
                 else {
                     printf("El grafo es no conexo, por lo tanto, no es posible calcular la k-conexidad.\n");
@@ -99,22 +94,15 @@ int main(int argc, char* argv[]) {
     
                 break;
             case 5:
-                clock_t start, end;
-                start = clock();
                 if (isConnected(graph, NULL)) {
                     printf("El grafo es conexo.\n");
                 }
                 else {
                     printf("El grafo es no conexo.\n");
                 }
-                end = clock();
-                double time = (double)(end - start) / CLOCKS_PER_SEC;
-                printf("Tiempo ejecución: %f\n", time);
                 break;
             case 6:
                 if (isConnected(graph, NULL)) {
-                    clock_t start, end;
-                    start = clock();
                     if (graph->num_vertices == 1) {
                         printf("La conectividad del grafo es 0.\n");
                     }
@@ -122,10 +110,7 @@ int main(int argc, char* argv[]) {
                         int connectivity_value = connectivity(graph);
                         printf("La conectividad del grafo es %d.\n", connectivity_value);
                     }
-                    end = clock();
-                    double time = (double)(end - start) / CLOCKS_PER_SEC;
-                    printf("Tiempo ejecución: %f\n", time);
-                    }
+                }
                 else {
                     printf("El grafo es no conexo, por lo tanto, no es posible calcular la conectividad.\n");
                 }
