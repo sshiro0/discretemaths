@@ -4,7 +4,7 @@ Proyecto Semestral: Matemáticas Discretas
 
 ## Integrantes:
 - Emily Gaete Bobadilla
-- Francisca Núñez Larenas
+- Manuel Núñez Larenas
 - Chloe Yañez Lavin
 
 ## Instrucciones de ejecución:
